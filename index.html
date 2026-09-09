@@ -140,6 +140,7 @@
   .msg .who { color: var(--pink); margin: 0 0 6px; }
   .msg .text { margin: 0; white-space: pre-wrap; }
   .msg pre { background: var(--black); color: var(--white); padding: 16px; overflow-x: auto; margin: 14px 0 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; line-height: 1.45; white-space: pre-wrap; }
+  .msg .cmd-block pre { padding: 54px 16px 16px; }
 
   .thinking { border: 2px solid var(--black); }
   .thinking .bar {
@@ -512,7 +513,7 @@ function copyText(text, done) {
   }
 }
 
-blocks.forEach(function (block) {
+function attachCopy(block) {
   if (block.hasAttribute('data-nocopy')) return;
 
   var pre = block.querySelector('pre');
@@ -538,7 +539,9 @@ blocks.forEach(function (block) {
   });
 
   block.appendChild(btn);
-});
+}
+
+blocks.forEach(attachCopy);
 
 /* ---------- os tabs ---------- */
 
@@ -610,9 +613,13 @@ function render() {
     parts.forEach(function (part, i) {
       if (!part.trim()) return;
       if (i % 2 === 1) {
+        var block = document.createElement('div');
+        block.className = 'cmd-block';
         var pre = document.createElement('pre');
         pre.textContent = part.replace(/\n$/, '');
-        wrap.appendChild(pre);
+        block.appendChild(pre);
+        attachCopy(block);
+        wrap.appendChild(block);
       } else {
         var p = document.createElement('p');
         p.className = 'text';
