@@ -371,15 +371,16 @@ cd YOUR-REPO</pre></div>
     <li>
       <div class="step-body">
         <h3>Get the code</h3>
-        <p>Paste the prompt into your AI assistant. Copy the code it gives you, open <code>index.html</code> in VS Code, replace everything, and save.</p>
+        <p>The prompt starts a conversation, not a one-off paste. Paste it into your AI assistant and it gives you a complete <code>index.html</code>. Copy that, open <code>index.html</code> in VS Code, replace everything, and save.</p>
+        <p>Then stay in that same conversation and ask for one change at a time.</p>
       </div>
     </li>
 
     <li>
       <div class="step-body">
         <h3>Publish the change</h3>
-        <p>Paste this into your terminal and hit enter:</p>
-        <div class="cmd-block"><pre>git add -A && git commit -m "add my page" && git push</pre></div>
+        <p>After each change your AI assistant gives you a line that looks a bit like this. Paste it into your terminal and hit enter:</p>
+        <div class="cmd-block" data-nocopy><pre>git add -A && git commit -m "add my page" && git push</pre></div>
         <p>Refresh your live address after twenty seconds.</p>
       </div>
     </li>
@@ -512,6 +513,8 @@ function copyText(text, done) {
 }
 
 blocks.forEach(function (block) {
+  if (block.hasAttribute('data-nocopy')) return;
+
   var pre = block.querySelector('pre');
   var btn = document.createElement('button');
   btn.className = 'copy';
