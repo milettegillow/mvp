@@ -11,6 +11,86 @@
     --black: #000;
     --white: #fff;
     --holo: conic-gradient(from 210deg at 50% 50%, #ef1f9f, #ffd9f1, #b9efff, #ffeec2, #d9c6ff, #ef1f9f);
+
+    /* Holographic foil, copied from thetechbros-site/src/styles/global.css.
+       Pastel foil, not a rainbow - every stop stays light and desaturated. */
+    --holo-base: #f3f0f9;
+    --holo-lilac: #ded0ff;
+    --holo-blue: #cce4ff;
+    --holo-mint: #c6f2da;
+    --holo-peach: #ffe0c9;
+    --holo-pink: #ffd2ec;
+
+    --holo-bloom: rgba(255, 255, 255, 0.85);
+    --holo-bloom-mid: rgba(255, 255, 255, 0.22);
+    --holo-bloom-fade: rgba(255, 255, 255, 0);
+    --holo-bloom-core: 8%;
+    --holo-bloom-size: 32%;
+
+    --holo-ray: rgba(255, 255, 255, 0.09);
+    --holo-ray-fade: rgba(255, 255, 255, 0);
+    --holo-ray-width: 10deg;
+    --holo-ray-gap: 20deg;
+    --holo-ray-from: 12deg;
+    --holo-ray-offset: 9%;
+    --holo-ray-x: calc(var(--holo-centre-x) - var(--holo-ray-offset));
+    --holo-ray-y: calc(var(--holo-centre-y) + var(--holo-ray-offset));
+
+    --holo-break-lilac: rgba(214, 199, 255, 0.2);
+    --holo-break-mint: rgba(198, 240, 220, 0.2);
+    --holo-break-pink: rgba(255, 214, 236, 0.2);
+    --holo-break-peach: rgba(255, 226, 200, 0.2);
+
+    --holo-centre-x: 55%;
+    --holo-centre-y: 45%;
+    --holo-sweep-from: 200deg;
+    --holo-break-x: 22%;
+    --holo-break-y: 82%;
+    --holo-break-from: 130deg;
+
+    /* Text on a holographic surface is always black. */
+    --color-on-holo: var(--black);
+
+    --holo-surface-image:
+      repeating-conic-gradient(
+        from var(--holo-ray-from) at var(--holo-ray-x) var(--holo-ray-y),
+        var(--holo-ray-fade) 0deg,
+        var(--holo-ray) var(--holo-ray-width),
+        var(--holo-ray-fade) var(--holo-ray-gap)
+      ),
+      radial-gradient(
+        circle at var(--holo-centre-x) var(--holo-centre-y),
+        var(--holo-bloom) 0%,
+        var(--holo-bloom-mid) var(--holo-bloom-core),
+        var(--holo-bloom-fade) var(--holo-bloom-size)
+      ),
+      conic-gradient(
+        from var(--holo-break-from) at var(--holo-break-x) var(--holo-break-y),
+        var(--holo-break-lilac) 0deg,
+        var(--holo-break-mint) 95deg,
+        var(--holo-break-pink) 180deg,
+        var(--holo-break-peach) 275deg,
+        var(--holo-break-lilac) 360deg
+      ),
+      conic-gradient(
+        from var(--holo-sweep-from) at var(--holo-centre-x) var(--holo-centre-y),
+        var(--holo-lilac) 0deg,
+        var(--holo-blue) 24deg,
+        var(--holo-mint) 48deg,
+        var(--holo-peach) 72deg,
+        var(--holo-pink) 96deg,
+        var(--holo-lilac) 120deg,
+        var(--holo-blue) 144deg,
+        var(--holo-mint) 168deg,
+        var(--holo-peach) 192deg,
+        var(--holo-pink) 216deg,
+        var(--holo-lilac) 240deg,
+        var(--holo-blue) 264deg,
+        var(--holo-mint) 288deg,
+        var(--holo-peach) 312deg,
+        var(--holo-pink) 336deg,
+        var(--holo-lilac) 360deg
+      );
   }
 
   * { box-sizing: border-box; border-radius: 0; }
@@ -47,6 +127,14 @@
   h2 {
     font-size: 34px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 400;
     margin: 0 0 8px; padding-bottom: 16px; border-bottom: 2px solid var(--black);
+  }
+
+  /* Paint order, top layer first: rays, bloom, breakup, base sweep. */
+  h2.holo {
+    background-color: var(--holo-base);
+    background-image: var(--holo-surface-image);
+    color: var(--color-on-holo);
+    padding-top: 16px;
   }
 
   .section-note { font-size: 18px; margin: 16px 0 0; max-width: 34em; }
@@ -202,7 +290,7 @@
 </header>
 
 <section id="setup">
-  <h2>Setup</h2>
+  <h2 class="holo">Setup</h2>
   <p class="section-note">Do this before the workshop, or you will spend the hour installing things.</p>
 
   <div class="os-tabs" role="tablist" aria-label="Choose your computer">
@@ -320,7 +408,7 @@ cd practice</pre></div>
 </section>
 
 <section id="build">
-  <h2>The build</h2>
+  <h2 class="holo">The build</h2>
   <p class="section-note">Plan: get something live in the first ten minutes, then improve it.</p>
 
   <ol class="steps">
