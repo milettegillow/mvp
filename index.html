@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to code an MVP in an hour</title>
+<style>
+  :root {
+    --pink: #ef1f9f;
+    --black: #000;
+    --white: #fff;
+    --holo: conic-gradient(from 210deg at 50% 50%, #ef1f9f, #ffd9f1, #b9efff, #ffeec2, #d9c6ff, #ef1f9f);
+  }
+
+  * { box-sizing: border-box; border-radius: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0; background: var(--white); color: var(--black);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 18px; line-height: 1.5;
+  }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 96px; }
+
+  a { color: var(--pink); text-decoration: none; border-bottom: 1px solid var(--pink); }
+  a:hover { background: var(--pink); color: var(--white); }
+  a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+    outline: 3px solid var(--pink); outline-offset: 2px;
+  }
+
+  header { padding: 40px 0 0; }
+
+  .wordmark { font-weight: 400; letter-spacing: -0.06em; font-size: 22px; color: var(--black); border: 0; display: inline-block; }
+  .wordmark:hover { background: none; color: var(--pink); }
+
+  h1 { font-size: 54px; line-height: 1.02; letter-spacing: -0.045em; font-weight: 400; margin: 48px 0 20px; }
+  .lede { font-size: 22px; line-height: 1.4; max-width: 34em; margin: 0; }
+
+  .meta { margin: 28px 0 0; padding: 20px 0 0; border-top: 2px solid var(--black); }
+  .meta p { margin: 0 0 6px; max-width: 34em; }
+  .meta p:last-child { margin-bottom: 0; }
+
+  section { margin-top: 80px; }
+
+  h2 {
+    font-size: 34px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 400;
+    margin: 0 0 8px; padding-bottom: 16px; border-bottom: 2px solid var(--black);
+  }
+
+  .section-note { font-size: 18px; margin: 16px 0 0; max-width: 34em; }
+
+  /* os tabs */
+
+  .os-tabs { display: flex; margin: 24px 0 0; }
+  .os-tabs button {
+    font-family: inherit; font-size: 18px; padding: 12px 26px;
+    background: var(--white); color: var(--black); border: 2px solid var(--black); cursor: pointer;
+  }
+  .os-tabs button + button { border-left: 0; }
+  .os-tabs button[aria-selected="true"] { background: var(--pink); border-color: var(--pink); color: var(--white); }
+  .os-tabs button:hover { background: var(--pink); border-color: var(--pink); color: var(--white); }
+
+  body.is-mac .os-win, body.is-win .os-mac { display: none; }
+
+  /* fields */
+
+  .field { margin: 0 0 14px; max-width: 26em; }
+  .field label { display: block; margin-bottom: 6px; }
+  .field input {
+    width: 100%; padding: 11px 13px;
+    border: 2px solid var(--black); background: var(--white); color: var(--black);
+    font-family: inherit; font-size: 18px;
+  }
+  .fields { margin-bottom: 14px; }
+
+  /* progress */
+
+  .progress { margin-top: 28px; }
+  .progress-count { margin: 0 0 8px; }
+  .progress-track { height: 14px; border: 2px solid var(--black); background: var(--white); }
+  .progress-fill { height: 100%; width: 0; background: var(--holo); transition: width .25s ease; }
+
+  /* steps */
+
+  ol.steps { list-style: none; margin: 8px 0 0; padding: 0; counter-reset: step; }
+  ol.steps > li {
+    counter-increment: step; display: grid; grid-template-columns: 46px 1fr;
+    gap: 0 16px; padding: 28px 0; border-bottom: 1px solid var(--black);
+  }
+  ol.steps > li::before { content: counter(step); font-size: 22px; line-height: 1.2; color: var(--pink); }
+
+  .step-body h3 { font-size: 22px; font-weight: 400; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .step-body h3 .tag { color: var(--pink); }
+  .step-body p { margin: 0 0 10px; max-width: 32em; }
+  .step-body p:last-child { margin-bottom: 0; }
+  .step-body code { background: var(--pink); color: var(--white); padding: 0 5px; }
+
+  /* command blocks */
+
+  .cmd-block { position: relative; margin: 0 0 12px; }
+  .cmd-block pre {
+    background: var(--black); color: var(--white); margin: 0;
+    padding: 54px 16px 16px; overflow-x: auto;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; line-height: 1.6;
+  }
+  .cmd-block .copy {
+    position: absolute; top: 10px; right: 10px;
+    font-family: inherit; font-size: 15px; padding: 6px 14px; min-width: 92px;
+    background: var(--pink); color: var(--white); border: 2px solid var(--pink); cursor: pointer;
+  }
+  .cmd-block .copy:hover { background: var(--white); color: var(--pink); }
+
+  .done-when { border-left: 3px solid var(--pink); padding-left: 14px; }
+
+  .check { display: inline-flex; align-items: center; gap: 10px; margin-top: 14px; cursor: pointer; user-select: none; }
+  .check input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .check .box { width: 26px; height: 26px; border: 2px solid var(--black); display: grid; place-items: center; flex: 0 0 auto; }
+  .check input:checked + .box { background: var(--pink); border-color: var(--pink); }
+  .check input:checked + .box::after { content: ""; width: 11px; height: 6px; border-left: 3px solid var(--white); border-bottom: 3px solid var(--white); transform: rotate(-45deg) translate(1px, -2px); }
+  .check input:focus-visible + .box { outline: 3px solid var(--pink); outline-offset: 2px; }
+  li.is-done .step-body h3 { text-decoration: line-through; text-decoration-thickness: 2px; }
+
+  /* builds */
+
+  .builds { list-style: none; margin: 24px 0 0; padding: 0; }
+  .builds li { padding: 24px 0; border-bottom: 1px solid var(--black); display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: baseline; }
+  .builds h3 { font-size: 24px; font-weight: 400; margin: 0; letter-spacing: -0.02em; }
+  .builds .hours { font-size: 24px; color: var(--pink); letter-spacing: -0.02em; white-space: nowrap; }
+  .builds p { grid-column: 1 / -1; margin: 6px 0 0; max-width: 32em; }
+
+  /* refiner */
+
+  .refiner { border: 2px solid var(--black); padding: 24px; margin-top: 24px; }
+  .chat { margin: 0 0 20px; }
+  .msg { padding: 16px 0; border-bottom: 1px solid var(--black); }
+  .msg:first-child { padding-top: 0; }
+  .msg .who { color: var(--pink); margin: 0 0 6px; }
+  .msg .text { margin: 0; white-space: pre-wrap; }
+  .msg pre { background: var(--black); color: var(--white); padding: 16px; overflow-x: auto; margin: 14px 0 0; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 15px; line-height: 1.45; white-space: pre-wrap; }
+
+  textarea {
+    width: 100%; min-height: 110px; padding: 14px;
+    border: 2px solid var(--black); background: var(--white); color: var(--black);
+    font-family: inherit; font-size: 18px; line-height: 1.4; resize: vertical;
+  }
+
+  .refiner-actions { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+
+  button.action {
+    font-family: inherit; font-size: 18px; padding: 12px 22px;
+    background: var(--pink); color: var(--white); border: 2px solid var(--pink); cursor: pointer;
+  }
+  button.action:hover { background: var(--white); color: var(--pink); }
+  button.action[disabled] { opacity: .45; cursor: default; }
+  button.action.secondary { background: var(--white); color: var(--black); border-color: var(--black); }
+  button.action.secondary:hover { background: var(--black); color: var(--white); }
+
+  .status { margin: 14px 0 0; }
+
+  footer { margin-top: 88px; padding-top: 24px; border-top: 2px solid var(--black); }
+  footer p { margin: 0; }
+
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+    h1 { font-size: 38px; }
+    h2 { font-size: 28px; }
+    .lede { font-size: 19px; }
+    ol.steps > li { grid-template-columns: 34px 1fr; gap: 0 12px; }
+    .builds li { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <a class="wordmark" href="https://thetechbros.io">the tech bros</a>
+  <h1>How to code an&nbsp;MVP in an hour</h1>
+  <div class="meta">
+    <p>Setup must happen before the workshop. Takes about 15 minutes (all free).</p>
+  </div>
+</header>
+
+<section id="setup">
+  <h2>Setup</h2>
+  <p class="section-note">Do this before the workshop, or you will spend the hour installing things.</p>
+
+  <div class="os-tabs" role="tablist" aria-label="Choose your computer">
+    <button role="tab" aria-selected="false" data-os="mac">Mac</button>
+    <button role="tab" aria-selected="false" data-os="win">Windows</button>
+  </div>
+
+  <div class="progress">
+    <p class="progress-count" id="progressCount">0 of 6 done</p>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <ol class="steps" id="setupSteps">
+    <li data-step="github">
+      <div class="step-body">
+        <h3>Create a GitHub account</h3>
+        <p>Sign up at <a href="https://github.com" target="_blank" rel="noopener">github.com</a>. This is where your code lives, with a history of every change. Pick a username you would put on a CV, because it becomes part of your web address.</p>
+        <div class="field">
+          <label for="username">Your GitHub username</label>
+          <input id="username" type="text" placeholder="YOUR-USERNAME" autocomplete="off" spellcheck="false">
+        </div>
+        <p class="done-when">Done when you can see your profile at <span data-fill>github.com/YOUR-USERNAME</span>.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+
+    <li data-step="vercel">
+      <div class="step-body">
+        <h3>Create a Vercel account</h3>
+        <p>Sign up at <a href="https://vercel.com/signup" target="_blank" rel="noopener">vercel.com</a> using <strong>Continue with GitHub</strong>, not email. Vercel puts what is on GitHub onto the internet, republishing about twenty seconds after every change.</p>
+        <p>The free plan is enough. Skip anything asking for a card.</p>
+        <p class="done-when">Done when you reach the Vercel dashboard.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+
+    <li data-step="vscode">
+      <div class="step-body">
+        <h3>Install VS Code</h3>
+        <p>Download from <a href="https://code.visualstudio.com" target="_blank" rel="noopener">code.visualstudio.com</a> and open it once. This is the app you write in.</p>
+        <p class="done-when">Done when VS Code opens.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+
+    <li data-step="git">
+      <div class="step-body">
+        <h3>Install Git</h3>
+        <p>Git moves your work between your laptop and GitHub. You use it by typing commands into a terminal.</p>
+
+        <div class="os-mac">
+          <p>Open Terminal: press Command Space, type <code>terminal</code>, press enter. Paste this into Terminal and hit enter:</p>
+          <div class="cmd-block"><pre>xcode-select --install</pre></div>
+          <p>Click install and let it finish. If it says they are already installed, move on.</p>
+        </div>
+
+        <div class="os-win">
+          <p>Install from <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com/download/win</a>, clicking next on every screen. Then open <strong>Git Bash</strong> from the Start menu. Use Git Bash, not Command Prompt or PowerShell.</p>
+        </div>
+
+        <p>Now tell Git who you are.</p>
+        <div class="fields">
+          <div class="field">
+            <label for="fullname">Your name</label>
+            <input id="fullname" type="text" placeholder="Your Name" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="email">The email you used for GitHub</label>
+            <input id="email" type="email" placeholder="you@example.com" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+        <p>Paste these into your terminal and hit enter:</p>
+        <div class="cmd-block"><pre>git config --global user.name "YOUR-NAME"
+git config --global user.email "YOUR-EMAIL"</pre></div>
+
+        <p>Now check it worked. Paste this in and hit enter:</p>
+        <div class="cmd-block"><pre>git --version</pre></div>
+        <p class="done-when">Did it print a number? Then you are done.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+
+    <li data-step="practice">
+      <div class="step-body">
+        <h3>Practice run <span class="tag">optional</span></h3>
+        <p>Runs the whole loop once on a throwaway project, so anything that breaks, breaks now.</p>
+        <p>Make a repository called <code>practice</code> at <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>. Tick <strong>Add a README file</strong>.</p>
+        <p>Paste this into your terminal and hit enter. It makes a folder called Code, then copies your practice project into it.</p>
+        <div class="cmd-block"><pre>mkdir -p ~/Code
+cd ~/Code
+git clone https://github.com/YOUR-USERNAME/practice.git
+cd practice</pre></div>
+        <p>In VS Code, go to File, then Open Folder, and choose Code, then practice. Open <code>README.md</code>, type anything, and save.</p>
+        <p>Back in the terminal, paste this in and hit enter:</p>
+        <div class="cmd-block"><pre>git add -A && git commit -m "first commit" && git push</pre></div>
+
+        <p>GitHub now needs to check it is really you. Usually a browser window opens and you click approve. That is it.</p>
+        <p>Sometimes instead the terminal asks for a username and password. Your normal GitHub password will not work here, because GitHub stopped accepting them a few years ago. Instead you need a token, which is just a long password GitHub generates for apps.</p>
+        <p>Make one at <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a>: choose Tokens (classic), Generate new token, tick the box marked <code>repo</code>, and generate. Copy it, and paste it into the terminal where it asks for your password. Nothing will appear on screen while you paste, which is normal.</p>
+
+        <p class="done-when">Done when your change shows on GitHub.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+
+    <li data-step="llm">
+      <div class="step-body">
+        <h3>Open an AI assistant in a tab</h3>
+        <p>Pick your favourite: <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a>, <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a> (a free account is fine for an hour). This will write your code, which you will then paste into VS Code.</p>
+        <p class="done-when">Done when you are logged in and can send a message.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section id="build">
+  <h2>The build</h2>
+  <p class="section-note">Plan: get something live in the first ten minutes, then improve it.</p>
+
+  <ol class="steps">
+    <li>
+      <div class="step-body">
+        <h3>Make a repository</h3>
+        <p>At <a href="https://github.com/new" target="_blank" rel="noopener">github.com/new</a>, name it in lowercase with hyphens instead of spaces. Leave it public. Tick <strong>Add a README file</strong>.</p>
+        <div class="field">
+          <label for="reponame">What you named it</label>
+          <input id="reponame" type="text" placeholder="YOUR-REPO" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Add your first page</h3>
+        <p>Click <strong>Add file</strong>, then <strong>Create new file</strong>. Name it <code>index.html</code>, type <code>&lt;h1&gt;hello&lt;/h1&gt;</code>, and commit.</p>
+        <p>The name matters: <code>index.html</code> is the page a site shows by default.</p>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Put it on the internet</h3>
+        <p>On Vercel: <strong>Add New</strong>, <strong>Project</strong>, find your repo, <strong>Import</strong>. Set Framework Preset to <strong>Other</strong> and click <strong>Deploy</strong>.</p>
+        <p>You now have a live address. Open it.</p>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Bring it onto your laptop</h3>
+        <p>Paste this into your terminal and hit enter:</p>
+        <div class="cmd-block"><pre>cd ~/Code
+git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
+cd YOUR-REPO</pre></div>
+        <p>Then open the folder in VS Code: File, Open Folder, Code, <span data-fill>YOUR-REPO</span>.</p>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Cut your idea down</h3>
+        <p>Use the tool below. It will ask a couple of questions and give you a smaller version, plus a prompt to build it.</p>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Get the code</h3>
+        <p>Paste the prompt into your AI assistant. Copy the code it gives you, open <code>index.html</code> in VS Code, replace everything, and save.</p>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Publish the change</h3>
+        <p>Paste this into your terminal and hit enter:</p>
+        <div class="cmd-block"><pre>git add -A && git commit -m "add my page" && git push</pre></div>
+        <p>Refresh your live address after twenty seconds.</p>
+      </div>
+    </li>
+
+    <li>
+      <div class="step-body">
+        <h3>Keep going</h3>
+        <p>One change at a time. Paste, save, push, refresh. When something breaks you will know which change broke it.</p>
+        <p>If you finish early, look up Claude Code or GitHub Copilot.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<section id="builds">
+  <h2>What fits in the time</h2>
+  <p class="section-note">Three of mine, along with how long they took.</p>
+
+  <ul class="builds">
+    <li>
+      <h3><a href="https://shire.milettegillow.com/" target="_blank" rel="noopener">A Long-Expected Party</a></h3>
+      <span class="hours">1 hour</span>
+      <p>An invitation site for a Tolkien-themed birthday.</p>
+    </li>
+    <li>
+      <h3><a href="https://datenightgames.milettegillow.com/" target="_blank" rel="noopener">Date Night Games</a></h3>
+      <span class="hours">8.5 hours</span>
+      <p>Games to play across a table.</p>
+    </li>
+    <li>
+      <h3><a href="https://thetechbros.io" target="_blank" rel="noopener">The Tech Bros</a></h3>
+      <span class="hours">23.5 hours</span>
+      <p>The fund's site. Several pages, lots of assets, application forms, automated emails.</p>
+    </li>
+  </ul>
+</section>
+
+<!-- REFINER START — delete this section, its styles and its script after the workshop -->
+<section id="refiner">
+  <h2>Cut your idea down</h2>
+  <p class="section-note">Describe what you want to build. It will ask a couple of questions, then give you a version that fits in forty minutes and a prompt to build it.</p>
+
+  <div class="refiner">
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <label for="ideaInput" style="display:block;margin-bottom:8px;">Your idea</label>
+    <textarea id="ideaInput" placeholder="A site where my friends vote on where we go for dinner"></textarea>
+    <div class="refiner-actions">
+      <button class="action" id="sendBtn">Send</button>
+      <button class="action secondary" id="resetBtn">Start again</button>
+    </div>
+    <p class="status" id="status"></p>
+  </div>
+</section>
+<!-- REFINER END -->
+
+<footer>
+  <p>we're betting on a new kind of tech bro</p>
+</footer>
+
+</div>
+
+<script>
+/* ---------- storage ---------- */
+
+var memory = {};
+var store = {
+  get: function (k) { try { return window.localStorage.getItem(k); } catch (e) { return memory[k] || null; } },
+  set: function (k, v) { try { window.localStorage.setItem(k, v); } catch (e) { memory[k] = v; } }
+};
+
+/* ---------- fill ---------- */
+
+var blocks = Array.prototype.slice.call(document.querySelectorAll('.cmd-block'));
+var spans = Array.prototype.slice.call(document.querySelectorAll('[data-fill]'));
+
+blocks.forEach(function (b) { b.dataset.tpl = b.querySelector('pre').textContent; });
+spans.forEach(function (s) { s.dataset.tpl = s.textContent; });
+
+var usernameInput = document.getElementById('username');
+var repoInput = document.getElementById('reponame');
+var nameInput = document.getElementById('fullname');
+var emailInput = document.getElementById('email');
+
+function substitute(text) {
+  return text
+    .split('YOUR-USERNAME').join(usernameInput.value.trim() || 'YOUR-USERNAME')
+    .split('YOUR-REPO').join(repoInput.value.trim().toLowerCase().replace(/\s+/g, '-') || 'YOUR-REPO')
+    .split('YOUR-NAME').join(nameInput.value.trim() || 'Your Name')
+    .split('YOUR-EMAIL').join(emailInput.value.trim() || 'you@example.com');
+}
+
+function fillAll() {
+  blocks.forEach(function (b) { b.querySelector('pre').textContent = substitute(b.dataset.tpl); });
+  spans.forEach(function (s) { s.textContent = substitute(s.dataset.tpl); });
+}
+
+[[usernameInput, 'mvp:username'], [repoInput, 'mvp:repo'], [nameInput, 'mvp:name'], [emailInput, 'mvp:email']]
+  .forEach(function (pair) {
+    var el = pair[0], key = pair[1];
+    el.value = store.get(key) || '';
+    el.addEventListener('input', function () { store.set(key, el.value.trim()); fillAll(); });
+  });
+
+fillAll();
+
+/* ---------- copy buttons ---------- */
+
+function copyText(text, done) {
+  var fallback = function () {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    done(ok);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+  } else {
+    fallback();
+  }
+}
+
+blocks.forEach(function (block) {
+  var pre = block.querySelector('pre');
+  var btn = document.createElement('button');
+  btn.className = 'copy';
+  btn.type = 'button';
+  btn.textContent = 'Copy';
+
+  btn.addEventListener('click', function () {
+    copyText(pre.textContent, function (ok) {
+      if (ok) {
+        btn.textContent = 'Copied \u2713';
+      } else {
+        btn.textContent = 'Select it';
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      setTimeout(function () { btn.textContent = 'Copy'; }, 1800);
+    });
+  });
+
+  block.appendChild(btn);
+});
+
+/* ---------- os tabs ---------- */
+
+var tabs = Array.prototype.slice.call(document.querySelectorAll('.os-tabs button'));
+
+function setOS(os) {
+  document.body.classList.toggle('is-mac', os === 'mac');
+  document.body.classList.toggle('is-win', os === 'win');
+  tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.os === os)); });
+  store.set('mvp:os', os);
+}
+
+tabs.forEach(function (t) { t.addEventListener('click', function () { setOS(t.dataset.os); }); });
+
+var savedOS = store.get('mvp:os');
+if (!savedOS) savedOS = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent) ? 'mac' : 'win';
+setOS(savedOS);
+
+/* ---------- setup checkboxes ---------- */
+
+var items = Array.prototype.slice.call(document.querySelectorAll('#setupSteps > li'));
+var fill = document.getElementById('progressFill');
+var count = document.getElementById('progressCount');
+
+function refresh() {
+  var done = 0;
+  items.forEach(function (li) {
+    var box = li.querySelector('.check input');
+    if (box.checked) { done++; li.classList.add('is-done'); }
+    else { li.classList.remove('is-done'); }
+  });
+  count.textContent = done + ' of ' + items.length + ' done';
+  fill.style.width = (done / items.length * 100) + '%';
+}
+
+items.forEach(function (li) {
+  var key = 'mvp:' + li.dataset.step;
+  var box = li.querySelector('.check input');
+  box.checked = store.get(key) === '1';
+  box.addEventListener('change', function () {
+    store.set(key, box.checked ? '1' : '0');
+    refresh();
+  });
+});
+
+refresh();
+
+/* REFINER SCRIPT START */
+
+var SYSTEM = [
+  "You are helping someone at a workshop called How to code an MVP in an hour.",
+  "They have never written code before. They have forty minutes.",
+  "They will build a single index.html file - HTML, CSS and JavaScript all in one file. No build step, no backend, no database, no user accounts, no npm packages, no external services. It gets deployed to Vercel as a static page.",
+  "Your job is to cut their idea down until it fits.",
+  "On your FIRST reply, ask two or three short clarifying questions and nothing else. Do not give a verdict yet.",
+  "On your SECOND reply, give exactly three things, in this order:",
+  "1. One or two sentences on whether the original idea fits in forty minutes. Be honest. Almost nothing does.",
+  "2. A cut-down version that does fit, described in three or four sentences. It must still be recognisably their idea.",
+  "3. A prompt they can paste into Claude or ChatGPT to build it, inside a markdown code block. The prompt must ask for a single complete index.html file with everything inline.",
+  "Write in British English. Use spaced hyphens, never em dashes. Be direct and brief. Do not lecture and do not pad.",
+  "Never refuse to help. Always give them something buildable."
+].join(" ");
+
+var history = [];
+var chat = document.getElementById('chat');
+var input = document.getElementById('ideaInput');
+var sendBtn = document.getElementById('sendBtn');
+var resetBtn = document.getElementById('resetBtn');
+var status = document.getElementById('status');
+
+function render() {
+  chat.innerHTML = '';
+  history.forEach(function (m) {
+    var wrap = document.createElement('div');
+    wrap.className = 'msg';
+
+    var who = document.createElement('p');
+    who.className = 'who';
+    who.textContent = m.role === 'user' ? 'You' : 'Claude';
+    wrap.appendChild(who);
+
+    var parts = m.content.split(/```(?:[a-z]*)\n?/);
+    parts.forEach(function (part, i) {
+      if (!part.trim()) return;
+      if (i % 2 === 1) {
+        var pre = document.createElement('pre');
+        pre.textContent = part.replace(/\n$/, '');
+        wrap.appendChild(pre);
+      } else {
+        var p = document.createElement('p');
+        p.className = 'text';
+        p.textContent = part.trim();
+        wrap.appendChild(p);
+      }
+    });
+
+    chat.appendChild(wrap);
+  });
+}
+
+/* Swap this one function for a fetch to /api/refine when it goes live on Vercel. */
+async function callClaude(messages) {
+  var res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: SYSTEM,
+      messages: messages
+    })
+  });
+  if (!res.ok) throw new Error("bad response");
+  var data = await res.json();
+  return data.content.map(function (b) { return b.text || ""; }).join("").trim();
+}
+
+async function send() {
+  var text = input.value.trim();
+  if (!text) { input.focus(); return; }
+
+  history.push({ role: 'user', content: text });
+  input.value = '';
+  render();
+
+  sendBtn.disabled = true;
+  status.textContent = 'Thinking';
+
+  try {
+    var reply = await callClaude(history);
+    history.push({ role: 'assistant', content: reply });
+    status.textContent = '';
+    render();
+  } catch (e) {
+    history.pop();
+    input.value = text;
+    status.textContent = 'That did not go through. Try again, or paste your idea into Claude or ChatGPT and ask it to cut the idea down to something buildable in forty minutes as a single HTML file.';
+  }
+
+  sendBtn.disabled = false;
+}
+
+sendBtn.addEventListener('click', send);
+input.addEventListener('keydown', function (e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') send();
+});
+resetBtn.addEventListener('click', function () {
+  history = [];
+  status.textContent = '';
+  input.value = '';
+  render();
+  input.focus();
+});
+
+/* REFINER SCRIPT END */
+</script>
+</body>
+</html>
