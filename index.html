@@ -572,7 +572,7 @@ refresh();
 
 /* REFINER SCRIPT START */
 
-var history = [];
+var chatHistory = [];
 var chat = document.getElementById('chat');
 var input = document.getElementById('ideaInput');
 var sendBtn = document.getElementById('sendBtn');
@@ -581,7 +581,7 @@ var status = document.getElementById('status');
 
 function render() {
   chat.innerHTML = '';
-  history.forEach(function (m) {
+  chatHistory.forEach(function (m) {
     var wrap = document.createElement('div');
     wrap.className = 'msg';
 
@@ -624,7 +624,7 @@ async function send() {
   var text = input.value.trim();
   if (!text) { input.focus(); return; }
 
-  history.push({ role: 'user', content: text });
+  chatHistory.push({ role: 'user', content: text });
   input.value = '';
   render();
 
@@ -632,12 +632,12 @@ async function send() {
   status.textContent = 'Thinking';
 
   try {
-    var reply = await callClaude(history);
-    history.push({ role: 'assistant', content: reply });
+    var reply = await callClaude(chatHistory);
+    chatHistory.push({ role: 'assistant', content: reply });
     status.textContent = '';
     render();
   } catch (e) {
-    history.pop();
+    chatHistory.pop();
     input.value = text;
     status.textContent = 'That did not go through. Try again, or paste your idea into Claude or ChatGPT and ask it to cut the idea down to something buildable in forty minutes as a single HTML file.';
   }
@@ -650,7 +650,7 @@ input.addEventListener('keydown', function (e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') send();
 });
 resetBtn.addEventListener('click', function () {
-  history = [];
+  chatHistory = [];
   status.textContent = '';
   input.value = '';
   render();
