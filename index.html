@@ -89,6 +89,7 @@
     gap: 0 16px; padding: 28px 0; border-bottom: 1px solid var(--black);
   }
   ol.steps > li::before { content: counter(step); font-size: 22px; line-height: 1.2; color: var(--pink); }
+  ol.steps > li[data-step="practice"]::before { content: "bonus"; font-size: 14px; }
 
   .step-body h3 { font-size: 22px; font-weight: 400; margin: 0 0 8px; letter-spacing: -0.02em; }
   .step-body h3 .tag { color: var(--pink); }
@@ -167,6 +168,7 @@
     h2 { font-size: 28px; }
     .lede { font-size: 19px; }
     ol.steps > li { grid-template-columns: 34px 1fr; gap: 0 12px; }
+    ol.steps > li[data-step="practice"]::before { font-size: 12px; }
     .builds li { grid-template-columns: 1fr; }
   }
 
@@ -268,6 +270,15 @@ git config --global user.email "YOUR-EMAIL"</pre></div>
       </div>
     </li>
 
+    <li data-step="llm">
+      <div class="step-body">
+        <h3>Open an AI assistant in a tab</h3>
+        <p>Pick your favourite: <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a>, <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a> (a free account is fine for an hour). This will write your code, which you will then paste into VS Code.</p>
+        <p class="done-when">Done when you are logged in and can send a message.</p>
+        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
+      </div>
+    </li>
+
     <li data-step="practice">
       <div class="step-body">
         <h3>Practice run <span class="tag">optional</span></h3>
@@ -287,15 +298,6 @@ cd practice</pre></div>
         <p>Make one at <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">github.com/settings/tokens</a>: choose Tokens (classic), Generate new token, tick the box marked <code>repo</code>, and generate. Copy it, and paste it into the terminal where it asks for your password. Nothing will appear on screen while you paste, which is normal.</p>
 
         <p class="done-when">Done when your change shows on GitHub.</p>
-        <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
-      </div>
-    </li>
-
-    <li data-step="llm">
-      <div class="step-body">
-        <h3>Open an AI assistant in a tab</h3>
-        <p>Pick your favourite: <a href="https://claude.ai" target="_blank" rel="noopener">Claude</a>, <a href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT</a>, <a href="https://gemini.google.com" target="_blank" rel="noopener">Gemini</a> (a free account is fine for an hour). This will write your code, which you will then paste into VS Code.</p>
-        <p class="done-when">Done when you are logged in and can send a message.</p>
         <label class="check"><input type="checkbox"><span class="box"></span><span class="label">Done</span></label>
       </div>
     </li>

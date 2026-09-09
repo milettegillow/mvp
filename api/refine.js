@@ -6,10 +6,10 @@ var SYSTEM = [
   "On your FIRST reply, ask two or three short clarifying questions and nothing else. Do not give a verdict yet.",
   "On your SECOND reply, give exactly three things, in this order:",
   "1. One or two sentences on whether the original idea fits in forty minutes. Be honest. Almost nothing does.",
-  "2. A cut-down version that does fit, described in three or four sentences. It must still be recognisably their idea.",
+  "2. A cut-down version that does fit, described in three or four sentences. It must still be recognisably their idea. Give them 3 cut-down versions they can choose between.",
   "3. A prompt they can paste into Claude or ChatGPT to build it, inside a markdown code block. The prompt must ask for a single complete index.html file with everything inline.",
   "Write in British English. Use spaced hyphens, never em dashes. Be direct and brief. Do not lecture and do not pad.",
-  "Never refuse to help. Always give them something buildable."
+  "Never refuse to help. Always give them something buildable.",
 ].join(" ");
 
 var MAX_MESSAGES = 20;
@@ -31,17 +31,34 @@ module.exports = async (req, res) => {
   }
 
   var messages = body && body.messages;
-  if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
-    return res.status(400).json({ error: "messages must be an array of 1 to " + MAX_MESSAGES + " entries" });
+  if (
+    !Array.isArray(messages) ||
+    messages.length === 0 ||
+    messages.length > MAX_MESSAGES
+  ) {
+    return res
+      .status(400)
+      .json({
+        error: "messages must be an array of 1 to " + MAX_MESSAGES + " entries",
+      });
   }
 
   for (var i = 0; i < messages.length; i++) {
     var content = messages[i] && messages[i].content;
     if (typeof content !== "string") {
-      return res.status(400).json({ error: "Each message must have string content" });
+      return res
+        .status(400)
+        .json({ error: "Each message must have string content" });
     }
     if (content.length > MAX_CONTENT_LENGTH) {
-      return res.status(400).json({ error: "Message content must be " + MAX_CONTENT_LENGTH + " characters or fewer" });
+      return res
+        .status(400)
+        .json({
+          error:
+            "Message content must be " +
+            MAX_CONTENT_LENGTH +
+            " characters or fewer",
+        });
     }
   }
 
@@ -57,14 +74,14 @@ module.exports = async (req, res) => {
       headers: {
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
-        "content-type": "application/json"
+        "content-type": "application/json",
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
         system: SYSTEM,
-        messages: messages
-      })
+        messages: messages,
+      }),
     });
   } catch (e) {
     return res.status(502).json({ error: "Upstream request failed" });
@@ -82,7 +99,9 @@ module.exports = async (req, res) => {
   }
 
   var text = (Array.isArray(data.content) ? data.content : [])
-    .map(function (block) { return block && typeof block.text === "string" ? block.text : ""; })
+    .map(function (block) {
+      return block && typeof block.text === "string" ? block.text : "";
+    })
     .join("")
     .trim();
 
